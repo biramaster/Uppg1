@@ -3,8 +3,25 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
+
+struct MaxMin {
+	unsigned int min;
+	unsigned int max;
+};
+struct Weapon
+{
+	char *namn;
+	MaxMin attackpoäng;
+};
+
+struct Highscore
+{
+	string namn;
+	unsigned int poäng;
+};
 
 void ov00();
 void ex01();
@@ -14,6 +31,11 @@ void ex04();
 void ex05();
 void ex06();
 void ex07();
+void displayLista(vector<string> *inventory);
+void bubelSort(vector<string> *inventory);
+void addNamn(vector<Highscore> *highscore);
+void displayLista(vector<Highscore> *highscore);
+void bubelSortHighscore(vector<Highscore> *highscore);
 
 void tellthestory(int GOLD_PIECES, int adventurers, int killed, int survivors,
 	string leader);
@@ -25,16 +47,69 @@ int main()
 {
 	locale swedish("swedish");
 	locale::global(swedish);
-	char done='N';
-	while (done != 'Y') {
-		ex06();
-		cin >> done;
+
+	vector<Highscore> myLista;
+
+	string done="Y";
+	while (done[0] != 'N') {
+		addNamn(&myLista);
+		bubelSortHighscore(&myLista);
+		displayLista(&myLista);
+		
+		cout << "\nVill du mata in ett nytt namn (Y/N)? ";
+		getline(cin, done);
 	}
 	cout << "Done!YES!";
-
-	
-
 	return 0;
+}
+
+void bubelSortHighscore(vector<Highscore> *highscore)
+{
+	for (unsigned int m = (*highscore).size() - 1; m > 0; m--)
+	{
+		for (unsigned int n = 0; n < m; n++)
+		{
+			if ((*highscore)[n].poäng < (*highscore)[n + 1].poäng)
+			{
+				Highscore temp = (*highscore)[n];
+				(*highscore)[n] = (*highscore)[n + 1];
+				(*highscore)[n + 1] = temp;
+			}
+		}
+	}
+}
+void addNamn(vector<Highscore> *highscore) {
+	Highscore myscore;
+	string namn;
+	unsigned int poäng;
+	cout << "Skriv in ditt namn?" << endl;
+	getline(cin, namn);
+	cout << "Skriv in poäng?" << endl;
+	cin >> poäng;
+	myscore.namn = namn;
+	myscore.poäng = poäng;
+	(*highscore).push_back(myscore);
+	cin.ignore(INT_MAX,'\n');
+	cin.clear();
+}
+
+void displayLista(vector<Highscore> *highscore) {
+	const char separator = ' ';
+	const int nameWidth = 18;
+	const int numWidth = 8;
+
+	cout << "======= HIGHSCORES =======" << endl;
+
+	cout << left << setw(nameWidth) << setfill(separator) << "Namn"
+		 << right << setw(numWidth) << setfill(separator) << "Poäng" << endl;
+
+	cout << "--------------------------" << endl;
+
+	for (unsigned int i = 0; i<(*highscore).size(); i++)
+	{
+		cout << left << setw(nameWidth) << setfill(separator) << (*highscore)[i].namn
+			<< right << setw(numWidth) << setfill(separator) << (*highscore)[i].poäng << endl;
+	}
 }
 
 void ov00() {	
@@ -275,5 +350,72 @@ void ex06() {
 }
 
 void ex07() {
+	vector<string> inventory;
+	inventory.push_back("sword");
+	inventory.push_back("armor");
+	inventory.push_back("shield");
+	bubelSort(&inventory);
+	displayLista(&inventory);
 
+	cout << "You have " << inventory.size() << " items.\n";
+
+	cout << "\nYour items:\n";
+	for (unsigned int i = 0; i < inventory.size(); ++i)
+	{
+		cout << inventory[i] << endl;
+	}
+
+	cout << "\nYou trade your sword for a battle axe.";
+	inventory[0] = "battle axe";
+	cout << "\nYour items:\n";
+	for (unsigned int i = 0; i < inventory.size(); ++i)
+	{
+		cout << inventory[i] << endl;
+	}
+
+	cout << "\nThe item name ’" << inventory[0] << "’ has ";
+	cout << inventory[0].size() << " letters in it.\n";
+
+	cout << "\nYour shield is destroyed in a fierce battle.";
+	inventory.pop_back();
+	cout << "\nYour items:\n";
+	for (unsigned int i = 0; i < inventory.size(); ++i)
+	{
+		cout << inventory[i] << endl;
+	}
+	cout << "\nYou were robbed of all of your possessions by a thief.";
+	inventory.clear();
+	if (inventory.empty())
+	{
+		cout << "\nYou have nothing.\n";
+	}
+	else
+	{
+		cout << "\nYou have at least one item.\n";
+	}
+}
+
+void displayLista(vector<string> *inventory) {
+	cout << "====================" << endl;
+	cout << "Namn                " << endl;
+	cout << "--------------------" << endl;
+	for (unsigned int i = 0; i<(*inventory).size(); i++)
+	{
+		cout << (*inventory)[i] << endl;
+	}
+}
+
+void bubelSort(vector<string> *inventory) {
+	for (unsigned int m = (*inventory).size() - 1; m > 0; m--)
+	{
+		for (unsigned int n = 0; n < m; n++)
+		{
+			if ((*inventory)[n] >(*inventory)[n + 1])
+			{
+				string temp = (*inventory)[n];
+				(*inventory)[n] = (*inventory)[n + 1];
+				(*inventory)[n + 1] = temp;
+			}
+		}
+	}
 }
